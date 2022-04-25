@@ -1,1 +1,1 @@
-phantomics/april, but in Python
+An attempt to implement a Dyalog-style APL in Python.

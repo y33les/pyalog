@@ -3,32 +3,52 @@ from sly import Lexer
 class APLLex(Lexer):
     # Set of token names.   This is always required
 
-    tokens = { ID, NUMBER, LPAREN, RPAREN, LBRACK, RBRACK, LBRACE,
+    tokens = { ID, INT, REAL, LPAREN, RPAREN, LBRACK, RBRACK, LBRACE,
                RBRACE, SPACE, LEFT, PLUS, MINUS, TIMES, DIVIDE, POWER,
                LOG, MDIV, CIRC, BANG, QUESTION, PIPE, CEIL, FLOOR,
-               TACKUP, TACKDN, LTACK, RTACK, EQ, NEQ, LTEQ, LT, GT,
+               TACKUP, TACKDN, TACKL, TACKR, EQ, NEQ, LTEQ, LT, GT,
                GTEQ, MATCH, TALLY, OR, AND, NAND, NOR, UP, DOWN,
-               ENCLOSE, DISCLOSE, NEST, SQUAD, GRADEUP, GRADEDN, IOTA,
+               LSHOE, RSHOE, LSHOESUB, SQUAD, GRADEUP, GRADEDN, IOTA,
                WHERE, ENLIST, FIND, UNION, INTERSECTION, TILDE,
                FSLASH, BSLASH, FSLASH1, BSLASH1, COMMA, CATENATE, RHO,
                ROTATE, ROTATE1, TRANSPOSE, EACH, SELFIE, REPEAT, DOT,
                JOT, ATOP, OVER, AT, QUOTEQUAD, QUAD, QUADCOL, KEY,
-               STENCIL, IBEAM, EXEC, FORMAT, SEP, LAMP, RIGHT, OMEGA,
-               ALPHA, DEL, AMP, OBAR, ZILDE, DELTA, DELTASUB }
+               STENCIL, IBEAM, EXEC, FORMAT, DIAMOND, LAMP, RIGHT, OMEGA,
+               ALPHA, DEL, AMP, OBAR, ZILDE, DELTA, DELTASUB,
+               DBLALPHA, DBLOMEGA }
 
     # String containing ignored characters between tokens
     ignore = ' \t'
+    ignore_comment = r'⍝.*$'
+
+    ## Compute line no.
+    #@_(r'\n+')
+    #def ignore_newline(self, t):
+    #    self.lineno += len(t.value)
+
+    ## Compute col no.
+    #def find_column(text, token):
+    #    last_cr = text.rfind('\n', 0, token.index)
+    #    if last_cr < 0:
+    #        last_cr = 0
+    #    column = (token.index - last_cr) + 1
+    #    return column
+
+    # TODO: Implement error handling
 
     # Regular expression rules for tokens
-    ID      = r'[a-zA-Z_][a-zA-Z0-9_]*'
-    NUMBER  = r'\d+'
+    ID      = r'[a-zA-Z_][a-zA-Z0-9_]+'
+    # TODO: implement complex numbers
+    REAL = r' \d*\.\d+' # TODO: implement 0x, 0b, E notation
+    INT  = r'\d+'
     LPAREN  = r'\('
     RPAREN  = r'\)'
     LBRACK = r'\['
     RBRACK = r'\]'
     LBRACE = r'\{'
     RBRACE = r'\}'
-    SPACE = r' '
+    SPACE = r'\ '
+    # TODO: implement characters and strings ("/')
 
     # APL symbols (Dyalog style)
     LEFT = r'←'
@@ -47,8 +67,8 @@ class APLLex(Lexer):
     FLOOR = r'⌊'
     TACKUP = r'⊥'
     TACKDN = r'⊤'
-    LTACK = r'⊣'
-    RTACK = r'⊢'
+    TACKL = r'⊣'
+    TACKR = r'⊢'
     EQ = r'='
     NEQ = r'≠'
     LTEQ = r'≤'
@@ -63,9 +83,9 @@ class APLLex(Lexer):
     NOR = r'⍱'
     UP = r'↑'
     DOWN = r'↓'
-    ENCLOSE = r'⊂'
-    DISCLOSE = r'⊃'
-    NEST = r'⊆'
+    LSHOE = r'⊂'
+    RSHOE = r'⊃'
+    LSHOESUB = r'⊆'
     SQUAD = r'⌷'
     GRADEUP = r'⍋'
     GRADEDN = r'⍒'
@@ -102,9 +122,11 @@ class APLLex(Lexer):
     IBEAM = r'⌶'
     EXEC = r'⍎'
     FORMAT = r'⍕'
-    SEP = r'⋄'
+    DIAMOND = r'[⋄\n]' # newline equivalent to statement separator, cf. rodrigogiraoserrao/RGSPL
     LAMP = r'⍝'
     RIGHT = r'→'
+    DBLOMEGA = r'⍵⍵'
+    DBLALPHA = r'⍺⍺'
     OMEGA = r'⍵'
     ALPHA = r'⍺'
     DEL = r'∇'
@@ -116,7 +138,8 @@ class APLLex(Lexer):
 
 if __name__ == '__main__':
     data = 'x = 3 + 42 * (s - t)'
-    life = 'life ← {⊃1 ⍵ ∨.∧ 3 4 = +/ +⌿ ¯1 0 1 ∘.⊖ ¯1 0 1 ⌽¨ ⊂⍵}'
+    numbers = '3 4.0 .5 12.34 12.3 3.45 4'
+    life = 'life ← {⊃1 ⍵ ∨.∧ 3 4 = +/ +⌿ ¯1 0 1 ∘.⊖ ¯1 0 1 ⌽¨ ⊂⍵} ⍝ GOL in APL'
     l = APLLex()
-    for t in l.tokenize(life):
+    for t in l.tokenize(numbers):
         print('type=%r, value=%r' % (t.type, t.value))
