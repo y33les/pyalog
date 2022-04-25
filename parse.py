@@ -6,37 +6,58 @@ class APLParse(Parser):
     tokens = APLLex.tokens
 
     # Grammar rules and actions
-    @_('expr PLUS term')
+    # TODO: Replace example string actions with actual meaningful actions
+    @_('expr dyad expr')
     def expr(self, p):
-        return p.expr + p.term
+        return("p.dyad("+str(p.expr0)+", "+str(p.expr1+")")
 
-    @_('expr MINUS term')
+    @_('monad expr')
     def expr(self, p):
-        return p.expr - p.term
-
-    @_('term')
-    def expr(self, p):
-        return p.term
-
-    @_('term TIMES factor')
-    def term(self, p):
-        return p.term * p.factor
-
-    @_('term DIVIDE factor')
-    def term(self, p):
-        return p.term / p.factor
-
-    @_('factor')
-    def term(self, p):
-        return p.factor
-
-    @_('NUMBER')
-    def factor(self, p):
-        return p.NUMBER
+        return("p.monad("+str(p.expr)+")")
 
     @_('LPAREN expr RPAREN')
-    def factor(self, p):
-        return p.expr
+    def expr(self, p):
+        return(str(p.expr))
+
+    @_('array')
+    def expr(self, p):
+        return(str(p.array))
+
+    @_('array array')
+    def array(self, p):
+        return(str(p.array0)+" + "+str(p.array1))
+
+    @_('scalar array')
+    def array(self, p):
+        return(str(p.scalar)+" + "+str(p.array))
+
+    @_('array scalar')
+    def array(self, p):
+        return(str(p.array)+" + "+str(p.scalar))
+
+    @_('scalar scalar')
+    def array(self, p):
+        return(str(p.scalar0)+" + "+str(p.scalar1))
+
+    @_('scalar')
+    def array(self, p):
+        return("arrayify("+str(p.scalar)+")" # TODO: implement arrayify)
+
+    @_('NUMBER')
+    def scalar(self, p):
+        return(str(p.NUMBER))
+
+    @_('CHAR')
+    def scalar(self, p):
+        return(str(p.CHAR))
+
+    @_('expr PLUS expr') # example dyadic function for now
+    def expr(self, p):
+        return(str(p.expr0)+" + "str(p.expr1))
+
+    @_('MINUS expr') # example monadic function for now
+    def expr(self, p):
+        return("-"+str(p.expr))
 
 if __name__ == '__main__':
     l = APLLex()

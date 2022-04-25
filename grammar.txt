@@ -1,0 +1,21 @@
+expr   : expr dyad expr
+       | monad expr
+       | LPAREN expr RPAREN
+       | array
+
+monad  : <monadic functions>
+
+dyad   : <dyadic functions>
+
+array  : array array
+       | array scalar
+       | scalar array
+       | scalar scalar
+       | scalar
+
+scalar : number
+       | char
+
+# TODO: operators?
+# TODO: dfns
+# TODO: extend monad/dyad to dfns containing ⍺+⍵ or just ⍵
