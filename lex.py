@@ -15,7 +15,7 @@ class APLLex(Lexer):
                JOT, ATOP, OVER, AT, QUOTEQUAD, QUAD, QUADCOL, KEY,
                STENCIL, IBEAM, EXEC, FORMAT, DIAMOND, LAMP, RIGHT, OMEGA,
                ALPHA, DEL, AMP, OBAR, ZILDE, DELTA, DELTASUB,
-               DBLALPHA, DBLOMEGA }
+               DBLALPHA, DBLOMEGA, STRING }
 
     # String containing ignored characters between tokens
     ignore = ' \t'
@@ -141,11 +141,19 @@ class APLLex(Lexer):
             t.value = int(t.value)
         return t
         # TODO: implement 0x, 0b, E notation, complex numbers, floats without integer parts (e.g .3)
+        # TODO: arrayify
+
+    @_(r'\'((\\\')|[^\'(\\\')])+\'')
+    def STRING(self,t):
+        t.value=t.value[1:-1]
+        return t
+    # TODO: arrayify
 
 if __name__ == '__main__':
     data = 'x = 3 + 42 * (s - t)'
     numbers = '3 4.0 .5 12.34 12.3 3.45 4 3J4'
+    strings = "foo 'bar' baz 'quux' xyzzy"
     life = 'life ← {⊃1 ⍵ ∨.∧ 3 4 = +/ +⌿ ¯1 0 1 ∘.⊖ ¯1 0 1 ⌽¨ ⊂⍵} ⍝ GOL in APL'
     l = APLLex()
-    for t in l.tokenize(numbers):
+    for t in l.tokenize(strings):
         print('type=%r, value=%r' % (t.type, t.value))
