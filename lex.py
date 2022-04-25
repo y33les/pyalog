@@ -38,7 +38,6 @@ class APLLex(Lexer):
 
     # Regular expression rules for tokens
     ID      = r'[a-zA-Z_][a-zA-Z0-9_]+'
-    NUMBER = r'\d*\.?\d+' # TODO: implement 0x, 0b, E notation, complex numbers, reals without 0. (e.g. .3)
     LPAREN  = r'\('
     RPAREN  = r'\)'
     LBRACK = r'\['
@@ -134,9 +133,18 @@ class APLLex(Lexer):
     DELTA = r'∆'
     DELTASUB = r'⍙'
 
+    @_(r'\d*\.?\d+')
+    def NUMBER(self,t):
+        if "." in t.value:
+            t.value = float(t.value)
+        else:
+            t.value = int(t.value)
+        return t
+        # TODO: implement 0x, 0b, E notation, complex numbers, floats without integer parts (e.g .3)
+
 if __name__ == '__main__':
     data = 'x = 3 + 42 * (s - t)'
-    numbers = '3 4.0 .5 12.34 12.3 3.45 4 5.'
+    numbers = '3 4.0 .5 12.34 12.3 3.45 4 3J4'
     life = 'life ← {⊃1 ⍵ ∨.∧ 3 4 = +/ +⌿ ¯1 0 1 ∘.⊖ ¯1 0 1 ⌽¨ ⊂⍵} ⍝ GOL in APL'
     l = APLLex()
     for t in l.tokenize(numbers):
