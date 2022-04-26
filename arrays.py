@@ -1,8 +1,40 @@
 # TODO: implement pyspark version?
 import numpy as np
+from functools import reduce
+from operator import and_
+
+# This is the goer I think
+# TODO: Need to handle enclosing (i.e. a one-item array array)
+class APLArray(np.ndarray):
+    _scalar_types = [int,float,str]
+    def __new__(cls,*args):
+        if not reduce(and_,list(map(lambda x: type(x) in cls._scalar_types, args + [APLScalar, APLArray]))): # TODO: finish implementing this
+        for i in args:
+            if not (isinstance(i,APLArray) or
+                    isinstance(i,APLScalar) or
+                    reduce(and_,list(map(f,args))):
+                if type(i) in cls._scalar_types:
+                    i=APLScalar(i)
+                else:
+                    raise TypeError
+
+        # Convert args to APLArrays (or maybe APLScalars?)?
+        return np.asarray(args,dtype=object).view(cls)
+
+    def __array_finalize__(self,obj):
+        if obj is None: return
+
+class APLScalar(APLArray):
+    def __new__(cls,value):
+    # TODO: additional types (e.g. complex numbers, functions, dfns,
+    #       maybe even objects in general (i.e. Python types)?
+        if ((not (type(value) in super()._scalar_types)) or
+            (isinstance(value,str) and len(value)!=1)):
+                raise TypeError
+        return np.asarray(value,dtype=object).view(cls)
 
 # TODO: type checking
-class APLArray(np.ndarray):
+class OldAPLArray(np.ndarray):
     def __init__(self,values,rank=0):
         for i in values:
             if not (isinstance(i,APLScalar) or
@@ -15,7 +47,7 @@ class APLArray(np.ndarray):
         self.depth = None # FIXME
     # TODO: methods
 
-class APLVector(APLArray):
+class OldAPLVector(APLArray):
     def __init__(self,values):
         for i in values:
             if not isinstance(i,APLScalar):
@@ -28,7 +60,7 @@ class APLVector(APLArray):
     # TODO: methods
 
 # TODO: type checking
-class APLScalar(APLArray):
+class OldAPLScalar(APLArray):
     # TODO: additional types (e.g. complex numbers, maybe even objects in general (i.e. Python types)?
     def __init__(self,value):
         if not (isinstance(value,int) or
@@ -42,7 +74,7 @@ class APLScalar(APLArray):
         self.depth = 0
     # TODO: methods
 
-class APLZilde(np.ndarray):
+class OldAPLZilde(np.ndarray):
     def __new__(cls):
         return super.__new__(cls,(0,))
 
