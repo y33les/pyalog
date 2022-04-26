@@ -1,6 +1,7 @@
 # APL builtin functions, *M=>monadic, *D=>dyadic
 
 # TODO: implement pyspark versions?
+import numpy as np
 
 # LEFT = r'←'
 def leftM(⍵):
