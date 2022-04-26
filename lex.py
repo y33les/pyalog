@@ -15,7 +15,7 @@ class APLLex(Lexer):
                JOT, ATOP, OVER, AT, QUOTEQUAD, QUAD, QUADCOL, KEY,
                STENCIL, IBEAM, EXEC, FORMAT, DIAMOND, LAMP, RIGHT, OMEGA,
                ALPHA, DEL, AMP, OBAR, ZILDE, DELTA, DELTASUB,
-               DBLALPHA, DBLOMEGA, STRING }
+               DBLALPHA, DBLOMEGA, STRING, CHAR }
 
     # String containing ignored characters between tokens
     ignore = ' \t'
