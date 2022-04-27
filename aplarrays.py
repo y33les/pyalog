@@ -8,20 +8,21 @@ from operator import and_
 # TODO: Need to handle arrays of arrays vs multidimensional arrays
 class APLArray(np.ndarray):
     _scalar_types = [int,float,str]
+
+    def __typecheck(cls,x):
+        if not type(x) in cls._scalar_types+[APLScalar,APLArray]:
+            return False
+        elif isinstance(x,str) and len(x)!=1:
+            return False
+        else:
+            return True
+
     def __new__(cls,*args):
-        if not reduce(and_,list(map(lambda x: type(x) in cls._scalar_types+[APLScalar,APLArray], args))): # TODO: finish implementing this
+        if not reduce(and_,list(map(lambda x: cls.__typecheck(cls,x), args))):
             raise TypeError
-        #for i in args:
-        #    if not (isinstance(i,APLArray) or
-        #            isinstance(i,APLScalar) or
-        #            reduce(and_,list(map(f,args))):
-        #        if type(i) in cls._scalar_types:
-        #            i=APLScalar(i)
-        #        else:
-        #            raise TypeError
 
         # Convert args to APLArrays (or maybe APLScalars?)?
-        return np.asarray(args,dtype=object).view(cls)
+        return np.asarray(list(map(lambda x: APLScalar(x) if type(x) in cls._scalar_types else x,args)),dtype=object).view(cls)
 
     def __array_finalize__(self,obj):
         if obj is None: return
@@ -33,7 +34,7 @@ class APLScalar(APLArray):
         if ((not (type(value) in super()._scalar_types)) or
             (isinstance(value,str) and len(value)!=1)):
                 raise TypeError
-        return np.asarray(value,dtype=object).view(cls)
+        return np.asarray(value).view(cls) # Do we need dtype=object here?
 
 # TODO: is this even necessary, or is this just handled by the AST?
 #       is this something that will be convertible to an AST?
