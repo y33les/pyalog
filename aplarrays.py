@@ -8,9 +8,10 @@ from operator import and_
 # TODO: Need to handle arrays of arrays vs multidimensional arrays
 class APLArray(np.ndarray):
     _scalar_types = [int,float,str]
+    _scalar=False
 
     def __typecheck(cls,x):
-        if not type(x) in cls._scalar_types+[APLScalar,APLArray]:
+        if not type(x) in cls._scalar_types+[APLArray]: # was: also APLScalar
             return False
         elif isinstance(x,str) and len(x)!=1:
             return False
@@ -22,11 +23,20 @@ class APLArray(np.ndarray):
             raise TypeError
 
         # Convert args to APLArrays (or maybe APLScalars?)?
-        return np.asarray(list(map(lambda x: APLScalar(x) if type(x) in cls._scalar_types else x,args)),dtype=object).view(cls)
+        # return np.asarray(list(map(lambda x: APLScalar(x) if type(x) in cls._scalar_types else x,args)),dtype=object).view(cls)
+        if len(args)==1: # Scalar case
+            return np.asarray(args).view(cls)
+        else:
+            return np.asarray(list(map(lambda x: APLArray(x) if type(x) in cls._scalar_types else x,args)),dtype=object).view(cls)
+
+    def __init__(self,*args):
+        if len(args)==1: # Scalar case
+            self._scalar=True
 
     def __array_finalize__(self,obj):
         if obj is None: return
 
+# Replaced by length-1 case in APLArray?
 class APLScalar(APLArray):
     def __new__(cls,value):
     # TODO: additional types (e.g. complex numbers, functions, dfns,
