@@ -10,24 +10,24 @@ def passfunc(x=0,y=0): # FIXME: Replace this with something proper inside APL*ad
     pass
 
 class APLNilad(ast.operator):
-    f = ast.Name(id='passfunc',ctx='load')
+    f = ast.Name(id='passfunc',ctx=ast.Load())
 
     def __init__(self,f):
-        self.f = ast.Name(id=f,ctx='load')
+        self.f = ast.Name(id=f,ctx=ast.Load())
         super().__init__()
 
 class APLMonad(ast.operator):
-    f = ast.Name(id='passfunc',ctx='load')
+    f = ast.Name(id='passfunc',ctx=ast.Load())
 
     def __init__(self,f):
-        self.f = ast.Name(id=f,ctx='load')
+        self.f = ast.Name(id=f,ctx=ast.Load())
         super().__init__()
 
 class APLDyad(ast.operator):
-    f = ast.Name(id='passfunc',ctx='load')
+    f = ast.Name(id='passfunc',ctx=ast.Load())
 
     def __init__(self,f):
-        self.f = ast.Name(id=f,ctx='load')
+        self.f = ast.Name(id=f,ctx=ast.Load())
         super().__init__()
 
 #class _APLTransformer(ast.NodeTransformer):
@@ -40,7 +40,7 @@ class APLTransformer(ast.NodeTransformer):
         self.generic_visit(node)
         if isinstance(node.op,APLDyad):
             if isinstance(node.op.f,ast.Name): # Call
-                return(ast.Call(node.op.f,[node.left,node.right]))
+                return(ast.Call(node.op.f,[node.left,node.right],keywords=[]))
             elif isinstance(node.op.f,ast.Lambda): # Lambda
                 raise Exception("lambdas not yet implemented") # TODO
             # TODO: dfn?
@@ -108,7 +108,7 @@ if __name__ == '__main__':
     while True:
         try:
             text = input('apl > ')
-            result = p.parse(l.tokenize(text))
+            result = t.visit(p.parse(l.tokenize(text)))
             print(to_source(result))
             #print(eval(compile(result, filename="<ast>", mode="eval")))
             #print(result)
