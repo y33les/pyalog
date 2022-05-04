@@ -12,6 +12,9 @@ def exprWrap(n):
 def callWrap(f,a):
     return ast.Call(ast.Name(id=f,ctx=ast.Load()),a,keywords=[]) # TODO: A proper lineno fix would be nice
 
+def encapsulate(n):
+    return n
+
 class APLParse(Parser):
     # Get the token list from the lexer (required)
     tokens = APLLex.tokens
@@ -22,6 +25,10 @@ class APLParse(Parser):
     @_('expr DIAMOND') # FIXME: Temporary hack to help me wrap my head around this - can probably do this with ^ actually, thinking about it (may need to modify the lexer) - or even with \n$ actually probably makes more sense, if we can get the precedence right (last)
     def root(self,p):
         return ast.fix_missing_locations(exprWrap(p.expr)) # The lineno fix should be in the root node only, and this should also be the only ast.Expression (the lineno fix fails for nested ast.Expressions)
+
+    @_('LPAREN expr RPAREN')
+    def expr(self,p):
+        return callWrap('encapsulate',[p.expr])
 
     @_('const')
     def expr(self,p):
