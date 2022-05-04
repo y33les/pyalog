@@ -6,47 +6,6 @@ from sly import Parser
 from lex import APLLex
 from arrayops import isAtomic
 
-def passfunc(x=0,y=0): # FIXME: Replace this with something proper inside APL*ad
-    pass
-
-class APLNilad(ast.operator):
-    f = ast.Name(id='passfunc',ctx=ast.Load())
-
-    def __init__(self,f):
-        self.f = ast.Name(id=f,ctx=ast.Load())
-        super().__init__()
-
-class APLMonad(ast.operator):
-    f = ast.Name(id='passfunc',ctx=ast.Load())
-
-    def __init__(self,f):
-        self.f = ast.Name(id=f,ctx=ast.Load())
-        super().__init__()
-
-class APLDyad(ast.operator):
-    f = ast.Name(id='passfunc',ctx=ast.Load())
-
-    def __init__(self,f):
-        self.f = ast.Name(id=f,ctx=ast.Load())
-        super().__init__()
-
-#class _APLTransformer(ast.NodeTransformer):
-class APLTransformer(ast.NodeTransformer):
-    def visit_APLDyad(self,node):
-        self.generic_visit(node)
-        return node
-
-    def visit_BinOp(self,node):
-        self.generic_visit(node)
-        if isinstance(node.op,APLDyad):
-            if isinstance(node.op.f,ast.Name): # Call
-                return(ast.Call(node.op.f,[node.left,node.right],keywords=[]))
-            elif isinstance(node.op.f,ast.Lambda): # Lambda
-                raise Exception("lambdas not yet implemented") # TODO
-            # TODO: dfn?
-            else:
-                raise TypeError("your dyad doesn't have a name or a lambda as its op")
-
 class APLParse(Parser):
     # Get the token list from the lexer (required)
     tokens = APLLex.tokens
@@ -68,7 +27,7 @@ class APLParse(Parser):
 
     @_('node COMMA node')
     def node(self, p):
-        return ast.BinOp(p.node0,APLDyad('testfunc'),p.node1)
+        return(ast.Call(ast.Name(id='testfunc',ctx=ast.Load()),[p.node0,p.node1],keywords=[]))
 
     # TODO: nilads
 
@@ -100,6 +59,8 @@ def testfunc(x,y):
     return x-y
 def testparse(e):
     print(to_source(p.parse(l.tokenize(e))))
+def testeval(e):
+    print(eval(compile(p.parse(l.tokenize(e)),filename="<ast>",mode="eval")))
 
 if __name__ == '__main__':
     l = APLLex()
