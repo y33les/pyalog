@@ -15,6 +15,34 @@ def callWrap(f,a):
 def encapsulate(n):
     return n
 
+lookup = { # TODO: Move this to a more appropriate module
+    'a': 'aplPlus',
+    'b': 'aplMinus'
+}
+
+class APLException(Exception):
+    pass
+
+def aplPlus(*args):
+    if len(args)==0:
+        print("+nilad!")
+    elif len(args)==1:
+        print("+monad!")
+    elif len(args)==2:
+        print("+dyad!")
+    else:
+        raise APLException
+
+def aplMinus(*args):
+    if len(args)==0:
+        print("-nilad!")
+    elif len(args)==1:
+        print("-monad!")
+    elif len(args)==2:
+        print("-dyad!")
+    else:
+        raise APLException
+
 class APLParse(Parser):
     # Get the token list from the lexer (required)
     tokens = APLLex.tokens
@@ -37,13 +65,26 @@ class APLParse(Parser):
     # Can we work out valence by delaying execution or using a transformer?
     # Can we work out valence with some kind of partial Call (like a projection in K)?
 
-    @_('COMMA expr') # Monadic comma
-    def expr(self, p):
-        return callWrap('testmonad',[p.expr])
+    #@_('COMMA expr') # Monadic comma
+    #def expr(self, p):
+    #    return callWrap('testmonad',[p.expr])
+    #
+    #@_('expr COMMA expr') # Dyadic comma
+    #def expr(self, p):
+    #    return callWrap('testdyad',[p.expr0,p.expr1])
 
-    @_('expr COMMA expr') # Dyadic comma
+    @_('FUNC') # Nilad
     def expr(self, p):
-        return callWrap('testdyad',[p.expr0,p.expr1])
+        print(p.FUNC)
+        return callWrap(lookup.get(p.FUNC),[])
+
+    @_('FUNC expr') # Monad
+    def expr(self, p):
+        return callWrap(lookup.get(p.FUNC),[p.expr])
+
+    @_('expr FUNC expr') # Dyad
+    def expr(self, p):
+        return callWrap(lookup.get(p.FUNC),[p.expr0,p.expr1])
 
     # TODO: nilads
 

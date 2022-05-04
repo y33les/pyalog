@@ -15,7 +15,7 @@ class APLLex(Lexer):
                JOT, ATOP, OVER, AT, QUOTEQUAD, QUAD, QUADCOL, KEY,
                STENCIL, IBEAM, EXEC, FORMAT, DIAMOND, LAMP, RIGHT, OMEGA,
                ALPHA, DEL, AMP, OBAR, ZILDE, DELTA, DELTASUB,
-               DBLALPHA, DBLOMEGA, STRING, CHAR }
+               DBLALPHA, DBLOMEGA, STRING, CHAR, FUNC }
 
     # String containing ignored characters between tokens
     ignore = ' \t'
@@ -49,10 +49,11 @@ class APLLex(Lexer):
 
     # APL symbols (Dyalog style)
     LEFT = r'←'
-    PLUS = r'\+'
-    MINUS = r'-'
-    TIMES = r'×'
-    DIVIDE = r'÷'
+    FUNC = r'[ab]' # TODO: Remove (test)
+    #PLUS = r'\+'
+    #MINUS = r'-'
+    #TIMES = r'×'
+    #DIVIDE = r'÷'
     POWER = r'\*'
     LOG = r'⍟'
     MDIV = r'⌹'
