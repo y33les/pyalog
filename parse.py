@@ -6,6 +6,12 @@ from sly import Parser
 from lex import APLLex
 from arrayops import isAtomic
 
+def exprWrap(n):
+    return ast.Expression(n) # TODO: A proper lineno fix would be nice
+
+def callWrap(f,a):
+    return ast.Call(ast.Name(id=f,ctx=ast.Load()),a,keywords=[]) # TODO: A proper lineno fix would be nice
+
 class APLParse(Parser):
     # Get the token list from the lexer (required)
     tokens = APLLex.tokens
@@ -13,51 +19,57 @@ class APLParse(Parser):
     # Grammar rules and actions
     precedence = (('right',)+tuple(tokens),)
 
-    @_('node')
+    @_('expr DIAMOND') # FIXME: Temporary hack to help me wrap my head around this - can probably do this with ^ actually, thinking about it (may need to modify the lexer) - or even with \n$ actually probably makes more sense, if we can get the precedence right (last)
+    def root(self,p):
+        return ast.fix_missing_locations(exprWrap(p.expr)) # The lineno fix should be in the root node only, and this should also be the only ast.Expression (the lineno fix fails for nested ast.Expressions)
+
+    @_('const')
     def expr(self,p):
-        return ast.fix_missing_locations(ast.Expression(p.node)) # TODO: A proper lineno fix would be nice
+        return p.const
 
-    @_('MINUS node')
-    def node(self, p):
-        return ast.UnaryOp(ast.USub(),p.node)
+    # Can we work out valence by delaying execution or using a transformer?
+    # Can we work out valence with some kind of partial Call (like a projection in K)?
 
-    @_('node PLUS node')
-    def node(self, p):
-        return ast.BinOp(p.node0,ast.Add(),p.node1)
+    @_('COMMA expr') # Monadic comma
+    def expr(self, p):
+        return callWrap('testmonad',[p.expr])
 
-    @_('node COMMA node')
-    def node(self, p):
-        return(ast.Call(ast.Name(id='testfunc',ctx=ast.Load()),[p.node0,p.node1],keywords=[]))
+    @_('expr COMMA expr') # Dyadic comma
+    def expr(self, p):
+        return callWrap('testdyad',[p.expr0,p.expr1])
 
     # TODO: nilads
 
     # TODO: strings
 
-    #@_('node node')
-    #def node(self, p):
+    #@_('const const')
+    #def const(self, p):
 
     @_('NUMBER')
-    def node(self, p):
+    def const(self, p):
         return ast.Constant(p.NUMBER)
 
     @_('CHAR')
-    def node(self, p):
+    def const(self, p):
         if p.CHAR=='q':
             exit(0)
         else:
             return ast.Constant(p.CHAR)
 
 # Test stuff # TODO: remove
-x=ast.Constant(2)
-y=ast.Constant(3)
-a=ast.BinOp(x,ast.Add(),y)
-b=ast.BinOp(x,APLDyad('testfunc'),y)
 l=APLLex()
 p=APLParse()
-t=APLTransformer()
-def testfunc(x,y):
+def testnilad():
+    return 2
+def testmonad(x):
+    return x+1
+def testdyad(x,y):
     return x-y
 def testparse(e):
+    return p.parse(l.tokenize(e))
+def testcompile(n):
+    return eval(compile(n,filename="<ast>",mode="eval"))
+def testsource(e):
     print(to_source(p.parse(l.tokenize(e))))
 def testeval(e):
     print(eval(compile(p.parse(l.tokenize(e)),filename="<ast>",mode="eval")))
@@ -69,7 +81,7 @@ if __name__ == '__main__':
     while True:
         try:
             text = input('apl > ')
-            result = t.visit(p.parse(l.tokenize(text)))
+            result = p.parse(l.tokenize(text))
             print(to_source(result))
             #print(eval(compile(result, filename="<ast>", mode="eval")))
             #print(result)
