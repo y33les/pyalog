@@ -30,6 +30,12 @@ lookup = {
 # TODO: Do nilads exist in Dyalog?  Or should it just return the function itself?`
 #       Decided that they don't; remember that a function can be partially implemented and its args updated in the ast.Call object
 
+######################################################################
+# TODO: !!!! Check numpy.* for already-implemented array-friendly maths functions !!!!
+######################################################################
+
+# TODO: Note that outer product is already implemented by numpy (numpy.ufunc.outer)
+
 # +
 def aplPlus(*args):
     """

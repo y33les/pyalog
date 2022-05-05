@@ -1,14 +1,37 @@
 import ast
+import numpy as np
+from arrayops import *
 from apl import *
 from astor import to_source
 from sly import Parser
 from lex import APLLex
+
+def evalMonad(f,a):
+    f = eval(f)
+    out = np.array([])
+    for i in np.nditer(a,flags=['external_loop']):
+        out = np.append(f(a),out)
+    return out
+
+def evalDyad(f,l,r):
+    raise NYI # TODO
 
 def exprWrap(n):
     return ast.Expression(n) # TODO: A proper lineno fix would be nice
 
 def callWrap(f,a):
     return ast.Call(ast.Name(id=f,ctx=ast.Load()),a,keywords=[]) # TODO: A proper lineno fix would be nice
+
+# TODO: Working on this at the moment, trying to use np.nditer to map functions over arrays
+def callPFunc(f,*a):
+    if len(a)==0:
+        raise NYI # TODO
+    elif len(a)==1:
+        return ast.Call(ast.Name(id='evalMonad',ctx=ast.Load()),[f,a],keywords=[])
+    elif len(a)==2:
+        raise NYI # TODO
+    else:
+        raise APLArgumentException
 
 def encapsulate(n):
     return n
@@ -39,31 +62,38 @@ class APLParse(Parser):
     @_('PFUNC') # Nilad
     def expr(self, p):
         print(p.PFUNC)
-        return callWrap(lookup.get(p.PFUNC),[])
+        return callPFunc(lookup.get(p.PFUNC),[])
 
     @_('PFUNC expr') # Monad
     def expr(self, p):
-        return callWrap(lookup.get(p.PFUNC),[p.expr])
+        return callPFunc(lookup.get(p.PFUNC),[p.expr])
 
     @_('expr PFUNC expr') # Dyad
     def expr(self, p):
-        return callWrap(lookup.get(p.PFUNC),[p.expr0,p.expr1])
+        return callPFunc(lookup.get(p.PFUNC),[p.expr0,p.expr1])
 
     # TODO: strings
 
-    #@_('const const')
-    #def const(self, p):
+    @_('expr SPACE expr')
+    def expr(self,p):
+        return callWrap('appendAPLArray',[p.expr0,p.expr1])
+
+    @_('const SPACE const')
+    def expr(self, p):
+        return callWrap('appendAPLArray',[p.const0,p.const1])
 
     @_('NUMBER')
     def const(self, p):
-        return ast.Constant(p.NUMBER)
+        #return ast.Constant(p.NUMBER)
+        return callWrap('toAPLArray',[ast.Constant(p.NUMBER)])
 
     @_('CHAR')
     def const(self, p):
         if p.CHAR=='q':
             exit(0)
         else:
-            return ast.Constant(p.CHAR)
+            #return ast.Constant(p.CHAR)
+            return callWrap('toAPLArray',[ast.Constant(p.CHAR)])
 
 # Test stuff # TODO: remove
 l=APLLex()
@@ -91,8 +121,9 @@ if __name__ == '__main__':
         try:
             text = input('apl > ')
             result = p.parse(l.tokenize(text+'\n'))
-            print(to_source(result))
-            #print(eval(compile(result, filename="<ast>", mode="eval")))
+            print("      "+to_source(result))
+            result = eval(compile(result, filename="<ast>", mode="eval"))
+            print("      ==> "+str(result)+": "+str(type(result))+"\n")
             #print(result)
         except EOFError:
             break
