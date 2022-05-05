@@ -1,10 +1,8 @@
-import numpy as np
-import operator as op
 import ast
+from apl import *
 from astor import to_source
 from sly import Parser
 from lex import APLLex
-from arrayops import isAtomic
 
 def exprWrap(n):
     return ast.Expression(n) # TODO: A proper lineno fix would be nice
@@ -15,34 +13,7 @@ def callWrap(f,a):
 def encapsulate(n):
     return n
 
-lookup = { # TODO: Move this to a more appropriate module
-    'a': 'aplPlus',
-    'b': 'aplMinus'
-}
-
-class APLException(Exception):
-    pass
-
-def aplPlus(*args):
-    if len(args)==0:
-        print("+nilad!")
-    elif len(args)==1:
-        print("+monad!")
-    elif len(args)==2:
-        print("+dyad!")
-    else:
-        raise APLException
-
-def aplMinus(*args):
-    if len(args)==0:
-        print("-nilad!")
-    elif len(args)==1:
-        print("-monad!")
-    elif len(args)==2:
-        print("-dyad!")
-    else:
-        raise APLException
-
+# TODO: Implement SKI combinator calculus (forks/trains)
 class APLParse(Parser):
     # Get the token list from the lexer (required)
     tokens = APLLex.tokens
@@ -65,28 +36,18 @@ class APLParse(Parser):
     # Can we work out valence by delaying execution or using a transformer?
     # Can we work out valence with some kind of partial Call (like a projection in K)?
 
-    #@_('COMMA expr') # Monadic comma
-    #def expr(self, p):
-    #    return callWrap('testmonad',[p.expr])
-    #
-    #@_('expr COMMA expr') # Dyadic comma
-    #def expr(self, p):
-    #    return callWrap('testdyad',[p.expr0,p.expr1])
-
-    @_('FUNC') # Nilad
+    @_('PFUNC') # Nilad
     def expr(self, p):
-        print(p.FUNC)
-        return callWrap(lookup.get(p.FUNC),[])
+        print(p.PFUNC)
+        return callWrap(lookup.get(p.PFUNC),[])
 
-    @_('FUNC expr') # Monad
+    @_('PFUNC expr') # Monad
     def expr(self, p):
-        return callWrap(lookup.get(p.FUNC),[p.expr])
+        return callWrap(lookup.get(p.PFUNC),[p.expr])
 
-    @_('expr FUNC expr') # Dyad
+    @_('expr PFUNC expr') # Dyad
     def expr(self, p):
-        return callWrap(lookup.get(p.FUNC),[p.expr0,p.expr1])
-
-    # TODO: nilads
+        return callWrap(lookup.get(p.PFUNC),[p.expr0,p.expr1])
 
     # TODO: strings
 
@@ -114,13 +75,13 @@ def testmonad(x):
 def testdyad(x,y):
     return x-y
 def testparse(e):
-    return p.parse(l.tokenize(e))
+    return p.parse(l.tokenize(e+"\n"))
 def testcompile(n):
     return eval(compile(n,filename="<ast>",mode="eval"))
 def testsource(e):
-    print(to_source(p.parse(l.tokenize(e))))
+    print(to_source(p.parse(l.tokenize(e+"\n"))))
 def testeval(e):
-    print(eval(compile(p.parse(l.tokenize(e)),filename="<ast>",mode="eval")))
+    print(eval(compile(p.parse(l.tokenize(e+"\n")),filename="<ast>",mode="eval")))
 
 if __name__ == '__main__':
     l = APLLex()

@@ -3,19 +3,7 @@ from sly import Lexer
 class APLLex(Lexer):
     # Set of token names.   This is always required
 
-    tokens = { ID, NUMBER, LPAREN, RPAREN, LBRACK, RBRACK, LBRACE,
-               RBRACE, SPACE, LEFT, PLUS, MINUS, TIMES, DIVIDE, POWER,
-               LOG, MDIV, CIRC, BANG, QUESTION, PIPE, CEIL, FLOOR,
-               TACKUP, TACKDN, TACKL, TACKR, EQ, NEQ, LTEQ, LT, GT,
-               GTEQ, MATCH, TALLY, OR, AND, NAND, NOR, UP, DOWN,
-               LSHOE, RSHOE, LSHOESUB, SQUAD, GRADEUP, GRADEDN, IOTA,
-               WHERE, ENLIST, FIND, UNION, INTERSECTION, TILDE,
-               FSLASH, BSLASH, FSLASH1, BSLASH1, COMMA, CATENATE, RHO,
-               ROTATE, ROTATE1, TRANSPOSE, EACH, SELFIE, REPEAT, DOT,
-               JOT, ATOP, OVER, AT, QUOTEQUAD, QUAD, QUADCOL, KEY,
-               STENCIL, IBEAM, EXEC, FORMAT, DIAMOND, LAMP, RIGHT, OMEGA,
-               ALPHA, DEL, AMP, OBAR, ZILDE, DELTA, DELTASUB,
-               DBLALPHA, DBLOMEGA, STRING, CHAR, FUNC }
+    tokens = { ID,LPAREN,RPAREN,LBRACK,RBRACK,LBRACE,RBRACE,SPACE,PFUNC,LEFT,EACH,SELFIE,REPEAT,DOT,JOT,ATOP,OVER,AT,QUOTEQUAD,QUAD,QUADCOL,KEY,STENCIL,IBEAM,DIAMOND,LAMP,RIGHT,DBLOMEGA,DBLALPHA,OMEGA,ALPHA,DEL,AMP,OBAR,ZILDE,DELTA,DELTASUB, CHAR, NUMBER }
 
     # String containing ignored characters between tokens
     ignore = ' \t'
@@ -47,63 +35,14 @@ class APLLex(Lexer):
     SPACE = r'\ '
     # TODO: implement characters and strings ("/')
 
+    # APL primitive functions
+    PFUNC = r'[+\-×÷|⌊⌈*⍟!○~?∧∨⍲⍱<≤=≥>≠⍴,⍪⌽⊖⍉↑↓⊂⊆∊⊃/⌿\\⍀∩∪⊣⊢⍳⍸⍒⍋⍷≡≢⍎⍕⊥⊤⌹⌷]'
+
+    # APL primitive operators
+    # TODO
+
     # APL symbols (Dyalog style)
     LEFT = r'←'
-    FUNC = r'[ab]' # TODO: Remove (test)
-    #PLUS = r'\+'
-    #MINUS = r'-'
-    #TIMES = r'×'
-    #DIVIDE = r'÷'
-    POWER = r'\*'
-    LOG = r'⍟'
-    MDIV = r'⌹'
-    CIRC = r'○'
-    BANG = r'!'
-    QUESTION = r'\?'
-    PIPE = r'\|'
-    CEIL = r'⌈'
-    FLOOR = r'⌊'
-    TACKUP = r'⊥'
-    TACKDN = r'⊤'
-    TACKL = r'⊣'
-    TACKR = r'⊢'
-    EQ = r'='
-    NEQ = r'≠'
-    LTEQ = r'≤'
-    LT = r'<'
-    GT = r'>'
-    GTEQ = r'≥'
-    MATCH = r'≡'
-    TALLY = r'≢'
-    OR = r'∨'
-    AND = r'∧'
-    NAND = r'⍲'
-    NOR = r'⍱'
-    UP = r'↑'
-    DOWN = r'↓'
-    LSHOE = r'⊂'
-    RSHOE = r'⊃'
-    LSHOESUB = r'⊆'
-    SQUAD = r'⌷'
-    GRADEUP = r'⍋'
-    GRADEDN = r'⍒'
-    IOTA = r'⍳'
-    WHERE = r'⍸'
-    ENLIST = r'∊'
-    FIND = r'⍷'
-    UNION = r'∪'
-    INTERSECTION = r'∩'
-    TILDE = r'~'
-    FSLASH = r'/'
-    BSLASH = r'\\'
-    FSLASH1 = r'⌿'
-    BSLASH1 = r'⍀'
-    COMMA = r','
-    CATENATE = r'⍪'
-    RHO = r'⍴'
-    ROTATE = r'⌽'
-    ROTATE1 = r'⊖'
-    TRANSPOSE = r'⍉'
     EACH = r'¨'
     SELFIE = r'⍨'
     REPEAT = r'⍣'
@@ -118,8 +57,6 @@ class APLLex(Lexer):
     KEY = r'⌸'
     STENCIL = r'⌺'
     IBEAM = r'⌶'
-    EXEC = r'⍎'
-    FORMAT = r'⍕'
     DIAMOND = r'[⋄\n]' # newline equivalent to statement separator, cf. rodrigogiraoserrao/RGSPL
     LAMP = r'⍝'
     RIGHT = r'→'
