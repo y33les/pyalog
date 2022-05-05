@@ -90,7 +90,7 @@ if __name__ == '__main__':
     while True:
         try:
             text = input('apl > ')
-            result = p.parse(l.tokenize(text))
+            result = p.parse(l.tokenize(text+'\n'))
             print(to_source(result))
             #print(eval(compile(result, filename="<ast>", mode="eval")))
             #print(result)
