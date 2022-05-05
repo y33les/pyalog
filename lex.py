@@ -71,14 +71,22 @@ class APLLex(Lexer):
     DELTA = r'∆'
     DELTASUB = r'⍙'
 
-    @_(r'\d*\.?\d+')
+    @_(r'\d*\.?\d+(J\d*\.?\d+)?')
     def NUMBER(self,t):
-        if "." in t.value:
+        if "J" in t.value:
+            t.value = t.value.split("J")
+            for i in range(len(t.value)):
+                if "." in t.value[i]:
+                    t.value[i] = float(t.value[i])
+                else:
+                    t.value[i] = int(t.value[i])
+            t.value = complex(t.value[0],t.value[1])
+        elif "." in t.value:
             t.value = float(t.value)
         else:
             t.value = int(t.value)
         return t
-        # TODO: implement 0x, 0b, E notation, complex numbers, floats without integer parts (e.g .3)
+        # TODO: implement 0x, 0b, E notation, floats without integer parts (e.g .3)
         # TODO: arrayify
 
     @_(r'\'.\'')
