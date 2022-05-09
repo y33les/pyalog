@@ -1,4 +1,5 @@
 import apl
+import math
 
 if __name__ == '__main__':
     # apl.py functions
@@ -44,3 +45,29 @@ if __name__ == '__main__':
     assert apl.aplCeil(2.8) == 3
     assert apl.aplCeil(15,3) == 15
     print("OK")
+
+    print("aplExp...",end=" ")
+    assert apl.aplExp(0) == 1.0
+    assert apl.aplExp(1) == math.e
+    assert apl.aplExp(2,3) == 8
+    asset apl.aplExp(4,0.5) == 2.0
+    print("OK")
+
+    print("aplLog...",end=" ")
+    assert apl.aplLog(1) == 0.0
+    assert apl.aplLog(4,16) == 2.0
+    assert apl.aplLog(2,32) == 5.0
+    assert apl.aplLog(10,1000) == 3.0
+    print("OK")
+
+    print("aplBang...",end=" ")
+    assert apl.aplBang(5) == 120
+    assert apl.aplBang(10) == 3628800
+    assert apl.aplBang(4,7) == 35
+    assert apl.aplBang(5,10) == 252
+    print("OK")
+
+    print("aplCirc...",end=" ")
+    # TODO: have manually tested this using _aplCircTest against tryapl.org but it would be nice to have proper automated tests
+    print("OK")
+

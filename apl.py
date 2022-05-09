@@ -1,4 +1,4 @@
-import math
+import math, cmath
 import numpy as np
 # TODO: implement pyspark versions?
 
@@ -23,8 +23,11 @@ lookup = {
     '|': 'aplPipe',
     '⌊': 'aplFloor',
     '⌈': 'aplCeil',
-    '*': 'aplExp'
-    # *⍟!○~?∧∨⍲⍱<≤=≥>≠⍴,⍪⌽⊖⍉↑↓⊂⊆∊⊃/⌿\\⍀∩∪⊣⊢⍳⍸⍒⍋⍷≡≢⍎⍕⊥⊤⌹⌷
+    '*': 'aplExp',
+    '⍟': 'aplLog',
+    '!': 'aplBang',
+    '○': 'aplCirc'
+    # ~?∧∨⍲⍱<≤=≥>≠⍴,⍪⌽⊖⍉↑↓⊂⊆∊⊃/⌿\\⍀∩∪⊣⊢⍳⍸⍒⍋⍷≡≢⍎⍕⊥⊤⌹⌷
 }
 
 # TODO: Do nilads exist in Dyalog?  Or should it just return the function itself?`
@@ -161,10 +164,83 @@ def aplExp(*args):
     if len(args)==0:
         return aplExp
     elif len(args)==1: # Monadic
-        return math.e**args[0]
+        return math.exp(args[0]) # TODO: Do we need math.expm1 for small x?
     elif len(args)==2: # Dyadic
-        return args[0]**args[1]
+        if isinstance(args[1],float):
+            return math.pow(args[0].args[1]) # More accurate for non-integer exponents, apparently
+        else:
+            return args[0]**args[1]
     else:
         raise APLArgumentException
 
-# ⍟!○~?∧∨⍲⍱<≤=≥>≠⍴,⍪⌽⊖⍉↑↓⊂⊆∊⊃/⌿\\⍀∩∪⊣⊢⍳⍸⍒⍋⍷≡≢⍎⍕⊥⊤⌹⌷
+# ⍟
+def aplLog(*args):
+    """
+    Monadic:\tln
+    Dyadic:\tlog
+    """
+    if len(args)==0:
+        return aplLog
+    elif len(args)==1: # Monadic
+        return math.log(args[0])
+    elif len(args)==2: # Dyadic
+        if args[0]==2:
+            return math.log2(args[1]) # More accurate than math.log(x,2), apparently
+        elif args[0]==10:
+            return math.log10(args[1]) # More accurate than math.log(x,10), apparently
+        else:
+            return math.log(args[1],args[0]) # Note the wacky APL order
+    else:
+        raise APLArgumentException
+
+#!
+def aplBang(*args):
+    """
+    Monadic:\tfactorial
+    Dyadic:\tbinomial
+    """
+    if len(args)==0:
+        return aplBang
+    elif len(args)==1:
+        return math.factorial(args[0])
+    elif len(args)==2:
+        return math.comb(args[1],args[0]) # Note the wacky APL order
+    else:
+        raise APLArgumentException
+
+#○
+def aplCirc(*args):
+    """
+    Monadic:\tπ times
+    Dyadic:\tcircular
+    """
+    if len(args)==0:
+        return aplCirc
+    elif len(args)==1:
+        return math.pi*args[0]
+    elif len(args)==2:
+        fs=[[(lambda x: cmath.sqrt(1-math.pow(args[1],2)))],
+            [cmath.sin,cmath.asin],
+            [cmath.cos,cmath.acos],
+            [cmath.tan,cmath.atan],
+            [(lambda x: cmath.sqrt(1+math.pow(args[1],2))),(lambda x: cmath.sqrt(math.pow(args[1],2)-1))],
+            [cmath.sinh,cmath.asinh],
+            [cmath.cosh,cmath.acosh],
+            [cmath.tanh,cmath.atanh],
+            [(lambda x: cmath.sqrt(-1-math.pow(args[1],2))),(lambda x: -cmath.sqrt(-1-math.pow(args[1],2)))],
+            [(lambda x: x.real),(lambda x: x)],
+            [(lambda x: aplPipe(x)),(lambda x: aplPlus(x))],
+            [(lambda x: x.imag),(lambda x: x*complex(0,1))],
+            [(lambda x: cmath.atan(x.imag/x.real) if x.real!=0 else aplTimes(x.imag)*cmath.pi/2),(lambda x: complex(cmath.cos(x),cmath.sin(x)))]]
+        return fs[abs(args[0])][args[0]<0](args[1])
+    else:
+        raise APLArgumentException
+
+def _aplCircTest(x):
+    for i in range(0,13):
+        print(str(i)+":",end="\t")
+        print(aplCirc(i,x),end="\t")
+        print(str(-i)+":",end="\t")
+        print(aplCirc(-i,x))
+
+#~?∧∨⍲⍱<≤=≥>≠⍴,⍪⌽⊖⍉↑↓⊂⊆∊⊃/⌿\\⍀∩∪⊣⊢⍳⍸⍒⍋⍷≡≢⍎⍕⊥⊤⌹⌷
