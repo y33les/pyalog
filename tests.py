@@ -1,5 +1,7 @@
 import apl
 import math
+from functools import reduce
+from operator import and_
 
 if __name__ == '__main__':
     # apl.py functions
@@ -50,7 +52,7 @@ if __name__ == '__main__':
     assert apl.aplExp(0) == 1.0
     assert apl.aplExp(1) == math.e
     assert apl.aplExp(2,3) == 8
-    asset apl.aplExp(4,0.5) == 2.0
+    assert apl.aplExp(4,0.5) == 2.0
     print("OK")
 
     print("aplLog...",end=" ")
@@ -68,6 +70,21 @@ if __name__ == '__main__':
     print("OK")
 
     print("aplCirc...",end=" ")
-    # TODO: have manually tested this using _aplCircTest against tryapl.org but it would be nice to have proper automated tests
+    # TODO: have manually tested this using _aplCircTest(4) against tryapl.org but it would be nice to have proper automated tests
     print("OK")
 
+    print("aplTilde...",end=" ")
+    assert apl.aplTilde(0) == 1
+    assert apl.aplTilde(1.0) == 0
+    # TODO: dyadic tests
+    print("OK")
+
+    print("aplQuestion...",end=" ")
+    for i in range(0,1000):
+        assert apl.aplQuestion(10) < 10
+        assert apl.aplQuestion(10) >= 0
+        assert len(apl.aplQuestion(3,10)) == 3
+        assert reduce(and_,(apl.aplQuestion(3,10) < 10))
+        assert reduce(and_,(apl.aplQuestion(3,10) >= 0))
+        # TODO: test weird dyadic behaviour with one argument (i.e. ?⍨⍵)
+    print("OK")

@@ -1,18 +1,22 @@
-import math, cmath
+import math, cmath, arrayops as a
 import numpy as np
+from random import randint, shuffle, sample
 # TODO: implement pyspark versions?
 
 class APLException(Exception):
     pass
 
-class APLArgumentException(Exception):
+class APLArgumentException(APLException):
     args=("==> You've passed wrong arguments somehow <==",)
 
     def __init__(self,args="==> You've passed wrong arguments somehow <=="):
         super().__init__(args)
         self.args=("==> You've passed wrong arguments somehow <==",)
 
-class NYI(Exception):
+class APLDomainError(APLException):
+    pass
+
+class NYI(APLException):
     pass
 
 lookup = {
@@ -26,8 +30,10 @@ lookup = {
     '*': 'aplExp',
     '⍟': 'aplLog',
     '!': 'aplBang',
-    '○': 'aplCirc'
-    # ~?∧∨⍲⍱<≤=≥>≠⍴,⍪⌽⊖⍉↑↓⊂⊆∊⊃/⌿\\⍀∩∪⊣⊢⍳⍸⍒⍋⍷≡≢⍎⍕⊥⊤⌹⌷
+    '○': 'aplCirc',
+    '~': 'aplTilde',
+    '?': 'aplQuestion'
+    #∧∨⍲⍱<≤=≥>≠⍴,⍪⌽⊖⍉↑↓⊂⊆∊⊃/⌿\\⍀∩∪⊣⊢⍳⍸⍒⍋⍷≡≢⍎⍕⊥⊤⌹⌷
 }
 
 # TODO: Do nilads exist in Dyalog?  Or should it just return the function itself?`
@@ -35,6 +41,7 @@ lookup = {
 
 ######################################################################
 # TODO: !!!! Check numpy.* for already-implemented array-friendly maths functions !!!!
+#            Update: there are so many, TODO: implement (see https://numpy.org/doc/stable/reference/routines.math.html)
 ######################################################################
 
 # TODO: Note that outer product is already implemented by numpy (numpy.ufunc.outer)
@@ -167,7 +174,7 @@ def aplExp(*args):
         return math.exp(args[0]) # TODO: Do we need math.expm1 for small x?
     elif len(args)==2: # Dyadic
         if isinstance(args[1],float):
-            return math.pow(args[0].args[1]) # More accurate for non-integer exponents, apparently
+            return math.pow(args[0],args[1]) # More accurate for non-integer exponents, apparently
         else:
             return args[0]**args[1]
     else:
@@ -201,9 +208,9 @@ def aplBang(*args):
     """
     if len(args)==0:
         return aplBang
-    elif len(args)==1:
+    elif len(args)==1: # Monadic
         return math.factorial(args[0])
-    elif len(args)==2:
+    elif len(args)==2: # Dyadic
         return math.comb(args[1],args[0]) # Note the wacky APL order
     else:
         raise APLArgumentException
@@ -213,12 +220,31 @@ def aplCirc(*args):
     """
     Monadic:\tπ times
     Dyadic:\tcircular
+
+    Circular function:
+
+      Trigonometric functions:
+        ⍺ =  0\t⍺○⍵ = sqrt(1-⍵²)
+        ⍺ =  1\t⍺○⍵ = sin ⍵\t\t-⍺○⍵ = arcsin ⍵
+        ⍺ =  2\t⍺○⍵ = cos ⍵\t\t-⍺○⍵ = arccos ⍵
+        ⍺ =  3\t⍺○⍵ = tan ⍵\t\t-⍺○⍵ = arctan ⍵
+        ⍺ =  4\t⍺○⍵ = sqrt(1+⍵²)\t-⍺○⍵ = sqrt(⍵²-1)
+        ⍺ =  5\t⍺○⍵ = sinh ⍵\t\t-⍺○⍵ = arcsinh ⍵
+        ⍺ =  6\t⍺○⍵ = cosh ⍵\t\t-⍺○⍵ = arccosh ⍵
+        ⍺ =  7\t⍺○⍵ = tanh ⍵\t\t-⍺○⍵ = arctanh ⍵
+
+      Functions on complex numbers:
+        ⍺ =  8\t⍺○⍵ = sqrt(¯1-⍵²)\t-⍺○⍵ = -sqrt(¯1-⍵²)
+        ⍺ =  9\t⍺○⍵ = real(⍵)\t\t-⍺○⍵ = ⍵
+        ⍺ = 10\t⍺○⍵ = |⍵\t\t-⍺○⍵ = +⍵
+        ⍺ = 11\t⍺○⍵ = imag(⍵)\t\t-⍺○⍵ = i×⍵
+        ⍺ = 12\t⍺○⍵ = phase(⍵)\t\t-⍺○⍵ = e^(i×⍵)
     """
     if len(args)==0:
         return aplCirc
-    elif len(args)==1:
+    elif len(args)==1: # Monadic
         return math.pi*args[0]
-    elif len(args)==2:
+    elif len(args)==2: # Dyadic
         fs=[[(lambda x: cmath.sqrt(1-math.pow(args[1],2)))],
             [cmath.sin,cmath.asin],
             [cmath.cos,cmath.acos],
@@ -243,4 +269,51 @@ def _aplCircTest(x):
         print(str(-i)+":",end="\t")
         print(aplCirc(-i,x))
 
-#~?∧∨⍲⍱<≤=≥>≠⍴,⍪⌽⊖⍉↑↓⊂⊆∊⊃/⌿\\⍀∩∪⊣⊢⍳⍸⍒⍋⍷≡≢⍎⍕⊥⊤⌹⌷
+#~
+def aplTilde(*args):
+    """
+    Monadic:\tnot
+    Dyadic:\twithout
+    """
+    if len(args)==0:
+        return aplTilde
+    elif len(args)==1: # Monadic
+        if args[0]==1:
+            return 0
+        elif args[0]==0:
+            return 1
+        else:
+            raise APLDomainError
+    elif len(args)==2: # Dyadic
+        return a.toAPLArray([e for e in args[0] if e not in args[1]])
+    else:
+        raise APLArgumentException
+
+#### POINT AT WHICH I REALISED ABOUT ALL THE NUMPY MATHS FUNCTIONS ####
+# TODO: Correct above methods
+
+#?
+def aplQuestion(*args):
+    """
+    Monadic:\troll
+    Dyadic:\tdeal
+    """
+    if len(args)==0:
+        return aplQuestion
+    elif len(args)==1:
+        return randint(0,args[0]-1) # TODO: Check this (Dyalog is 1-indexed)
+    elif len(args)==2:
+        if(args[1]<args[0]):
+            raise APLDomainError
+        else:
+            l=list(range(0,args[1])) # TODO: Check this (Dyalog is 1-indexed)
+            if args[1]==None: # TODO: Check this (Dyalog can do ?⍨⍵ (i.e. ⍺?) to do a random permutation of ⍳⍺ (see APL Wiki))
+                # FIXME: It doesn't seem to like taking None as an argument
+                shuffle(l)
+                return a.toAPLArray(l)
+            else:
+                return a.toAPLArray(sample(l,args[0]))
+    else:
+        raise APLArgumentException
+
+#∧∨⍲⍱<≤=≥>≠⍴,⍪⌽⊖⍉↑↓⊂⊆∊⊃/⌿\\⍀∩∪⊣⊢⍳⍸⍒⍋⍷≡≢⍎⍕⊥⊤⌹⌷
