@@ -21,7 +21,7 @@ lookup = {
     '×': 'aplTimes',
     '÷': 'aplDivide',
     '|': 'aplPipe',
-    '⌈': 'aplFloor',
+    '⌊': 'aplFloor',
     '⌈': 'aplCeil',
     '*': 'aplExp'
     # *⍟!○~?∧∨⍲⍱<≤=≥>≠⍴,⍪⌽⊖⍉↑↓⊂⊆∊⊃/⌿\\⍀∩∪⊣⊢⍳⍸⍒⍋⍷≡≢⍎⍕⊥⊤⌹⌷
@@ -161,9 +161,9 @@ def aplExp(*args):
     if len(args)==0:
         return aplExp
     elif len(args)==1: # Monadic
-        return math.e^args[0]
+        return math.e**args[0]
     elif len(args)==2: # Dyadic
-        return args[0]^args[1]
+        return args[0]**args[1]
     else:
         raise APLArgumentException
 

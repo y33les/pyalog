@@ -22,17 +22,6 @@ def exprWrap(n):
 def callWrap(f,a):
     return ast.Call(ast.Name(id=f,ctx=ast.Load()),a,keywords=[]) # TODO: A proper lineno fix would be nice
 
-# TODO: Working on this at the moment, trying to use np.nditer to map functions over arrays
-def callPFunc(f,*a):
-    if len(a)==0:
-        raise NYI # TODO
-    elif len(a)==1:
-        return ast.Call(ast.Name(id='evalMonad',ctx=ast.Load()),[f,a],keywords=[])
-    elif len(a)==2:
-        raise NYI # TODO
-    else:
-        raise APLArgumentException
-
 def encapsulate(n):
     return n
 
@@ -62,15 +51,15 @@ class APLParse(Parser):
     @_('PFUNC') # Nilad
     def expr(self, p):
         print(p.PFUNC)
-        return callPFunc(lookup.get(p.PFUNC),[])
+        return callPFunc(lookup.get(p.PFUNC))
 
     @_('PFUNC expr') # Monad
     def expr(self, p):
-        return callPFunc(lookup.get(p.PFUNC),[p.expr])
+        return ast.Call(ast.Name(id=lookup.get(p.PFUNC),ctx=ast.Load()),[p.expr],keywords=[])
 
     @_('expr PFUNC expr') # Dyad
     def expr(self, p):
-        return callPFunc(lookup.get(p.PFUNC),[p.expr0,p.expr1])
+        return ast.Call(ast.Name(id=lookup.get(p.PFUNC),ctx=ast.Load()),[p.expr0,p.expr1],keywords=[])
 
     # TODO: strings
 
