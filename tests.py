@@ -88,3 +88,19 @@ if __name__ == '__main__':
         assert reduce(and_,(apl.aplQuestion(3,10) >= 0))
         # TODO: test weird dyadic behaviour with one argument (i.e. ?⍨⍵)
     print("OK")
+
+    print("aplAnd...",end=" ")
+    assert apl.aplAnd(0,0) == 0
+    assert apl.aplAnd(0,1) == 0
+    assert apl.aplAnd(1,0) == 0
+    assert apl.aplAnd(1,1) == 1
+    assert apl.aplAnd(4,10) == 20 # lcm
+    print("OK")
+
+    print("aplOr...",end=" ")
+    assert apl.aplOr(0,0) == 0
+    assert apl.aplOr(0,1) == 1
+    assert apl.aplOr(1,0) == 1
+    assert apl.aplOr(1,1) == 1
+    assert apl.aplOr(8,20) == 4 # gcd
+    print("OK")

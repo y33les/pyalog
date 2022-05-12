@@ -32,8 +32,10 @@ lookup = {
     '!': 'aplBang',
     '○': 'aplCirc',
     '~': 'aplTilde',
-    '?': 'aplQuestion'
-    #∧∨⍲⍱<≤=≥>≠⍴,⍪⌽⊖⍉↑↓⊂⊆∊⊃/⌿\\⍀∩∪⊣⊢⍳⍸⍒⍋⍷≡≢⍎⍕⊥⊤⌹⌷
+    '?': 'aplQuestion',
+    '∧': 'aplAnd',
+    '∨': 'aplOr'
+    #⍲⍱<≤=≥>≠⍴,⍪⌽⊖⍉↑↓⊂⊆∊⊃/⌿\\⍀∩∪⊣⊢⍳⍸⍒⍋⍷≡≢⍎⍕⊥⊤⌹⌷
 }
 
 # TODO: Do nilads exist in Dyalog?  Or should it just return the function itself?`
@@ -316,4 +318,30 @@ def aplQuestion(*args):
     else:
         raise APLArgumentException
 
-#∧∨⍲⍱<≤=≥>≠⍴,⍪⌽⊖⍉↑↓⊂⊆∊⊃/⌿\\⍀∩∪⊣⊢⍳⍸⍒⍋⍷≡≢⍎⍕⊥⊤⌹⌷
+#∧
+def aplAnd(*args):
+    """
+    (Dyadic only)
+    Dyadic: LCM/and
+    """
+    if len(args)==0:
+        return aplAnd
+    elif len(args)==2: # Dyadic only
+        return np.lcm(args[0],args[1])
+    else:
+        raise APLArgumentException
+
+#∨
+def aplOr(*args):
+    """
+    (Dyadic only)
+    Dyadic: GCD/and
+    """
+    if len(args)==0:
+        return aplOr
+    elif len(args)==2: # Dyadic only
+        return np.gcd(args[0],args[1])
+    else:
+        raise APLArgumentException
+
+#⍲⍱<≤=≥>≠⍴,⍪⌽⊖⍉↑↓⊂⊆∊⊃/⌿\\⍀∩∪⊣⊢⍳⍸⍒⍋⍷≡≢⍎⍕⊥⊤⌹⌷
