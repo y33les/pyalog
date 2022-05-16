@@ -104,3 +104,52 @@ if __name__ == '__main__':
     assert apl.aplOr(1,1) == 1
     assert apl.aplOr(8,20) == 4 # gcd
     print("OK")
+
+    print("aplNand...",end=" ")
+    assert apl.aplNand(0,0) == 1
+    assert apl.aplNand(0,1) == 1
+    assert apl.aplNand(1,0) == 1
+    assert apl.aplNand(1,1) == 0
+    print("OK")
+
+    print("aplNor...",end=" ")
+    assert apl.aplNor(0,0) == 1
+    assert apl.aplNor(0,1) == 0
+    assert apl.aplNor(1,0) == 0
+    assert apl.aplNor(1,1) == 0
+    print("OK")
+
+    print("aplLess...",end=" ")
+    assert apl.aplLess(2,3) == 1
+    assert apl.aplLess(3,2) == 0
+    assert apl.aplLess(2,2) == 0
+    print("OK")
+
+    print("aplLEq...",end=" ")
+    assert apl.aplLEq(2,3) == 1
+    assert apl.aplLEq(3,2) == 0
+    assert apl.aplLEq(2,2) == 1
+    print("OK")
+
+    print("aplEquals...",end=" ")
+    assert apl.aplEquals(2,3) == 0
+    assert apl.aplEquals(2,2) == 1
+    print("OK")
+
+    print("aplGEq...",end=" ")
+    assert apl.aplGEq(2,3) == 0
+    assert apl.aplGEq(3,2) == 1
+    assert apl.aplGEq(2,2) == 1
+    print("OK")
+
+    print("aplGreater...",end=" ")
+    assert apl.aplGreater(2,3) == 0
+    assert apl.aplGreater(3,2) == 1
+    assert apl.aplGreater(2,2) == 0
+    print("OK")
+
+    print("aplNEq...",end=" ")
+    assert apl.aplNEq(2,3) == 1
+    assert apl.aplNEq(2,2) == 0
+    print("OK")
+

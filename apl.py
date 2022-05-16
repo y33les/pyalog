@@ -34,11 +34,19 @@ lookup = {
     '~': 'aplTilde',
     '?': 'aplQuestion',
     '∧': 'aplAnd',
-    '∨': 'aplOr'
-    #⍲⍱<≤=≥>≠⍴,⍪⌽⊖⍉↑↓⊂⊆∊⊃/⌿\\⍀∩∪⊣⊢⍳⍸⍒⍋⍷≡≢⍎⍕⊥⊤⌹⌷
+    '∨': 'aplOr',
+    '⍲': 'aplNand',
+    '⍱': 'aplNor',
+    '<': 'aplLess',
+    '≤': 'aplLEq',
+    '=': 'aplEquals',
+    '≥': 'aplGEq',
+    '>': 'aplGreater',
+    '≠': 'aplNEq'
+    #⍴,⍪⌽⊖⍉↑↓⊂⊆∊⊃/⌿\\⍀∩∪⊣⊢⍳⍸⍒⍋⍷≡≢⍎⍕⊥⊤⌹⌷
 }
 
-# TODO: Do nilads exist in Dyalog?  Or should it just return the function itself?`
+# TODO: Do nilads exist in Dyalog?  Or should it just return the function itself?
 #       Decided that they don't; remember that a function can be partially implemented and its args updated in the ast.Call object
 
 ######################################################################
@@ -322,7 +330,7 @@ def aplQuestion(*args):
 def aplAnd(*args):
     """
     (Dyadic only)
-    Dyadic: LCM/and
+    Dyadic:\tLCM/and
     """
     if len(args)==0:
         return aplAnd
@@ -335,7 +343,7 @@ def aplAnd(*args):
 def aplOr(*args):
     """
     (Dyadic only)
-    Dyadic: GCD/and
+    Dyadic:\tGCD/and
     """
     if len(args)==0:
         return aplOr
@@ -344,4 +352,114 @@ def aplOr(*args):
     else:
         raise APLArgumentException
 
-#⍲⍱<≤=≥>≠⍴,⍪⌽⊖⍉↑↓⊂⊆∊⊃/⌿\\⍀∩∪⊣⊢⍳⍸⍒⍋⍷≡≢⍎⍕⊥⊤⌹⌷
+#⍲
+def aplNand(*args):
+    """
+    (Dyadic only)
+    Dyadic:\tNand
+    """
+    if len(args)==0:
+        return aplNand
+    elif len(args)==2: # Dyadic only
+        if (args[0]==0 or args[0]==1) and (args[1]==0 or args[1]==1):
+            return int(np.logical_not(np.logical_and(args[0],args[1])))
+        else:
+            raise APLDomainError
+    else:
+        raise APLArgumentException
+
+#⍱
+def aplNor(*args):
+    """
+    (Dyadic only)
+    Dyadic:\tNor
+    """
+    if len(args)==0:
+        return aplNor
+    elif len(args)==2: # Dyadic only
+        if (args[0]==0 or args[0]==1) and (args[1]==0 or args[1]==1):
+            return int(np.logical_not(np.logical_or(args[0],args[1])))
+        else:
+            raise APLDomainError
+    else:
+        raise APLArgumentException
+
+#<
+def aplLess(*args):
+    """
+    (Dyadic only)
+    Dyadic:\tLess than
+    """
+    if len(args)==0:
+        return aplLess
+    elif len(args)==2: # Dyadic only
+        return np.less(args[0],args[1])
+    else:
+        raise APLArgumentException
+
+#≤
+def aplLEq(*args):
+    """
+    (Dyadic only)
+    Dyadic:\tLess than or equal to
+    """
+    if len(args)==0:
+        return aplLEq
+    elif len(args)==2: # Dyadic only
+        return np.less_equal(args[0],args[1])
+    else:
+        raise APLArgumentException
+
+#=
+def aplEquals(*args):
+    """
+    (Dyadic only)
+    Dyadic:\tLess than or equal to
+    """
+    if len(args)==0:
+        return aplEquals
+    elif len(args)==2: # Dyadic only
+        return np.equal(args[0],args[1])
+    else:
+        raise APLArgumentException
+
+#≥
+def aplGEq(*args):
+    """
+    (Dyadic only)
+    Dyadic:\tLess than or equal to
+    """
+    if len(args)==0:
+        return aplGEq
+    elif len(args)==2: # Dyadic only
+        return np.greater_equal(args[0],args[1])
+    else:
+        raise APLArgumentException
+
+#>
+def aplGreater(*args):
+    """
+    (Dyadic only)
+    Dyadic:\tLess than or equal to
+    """
+    if len(args)==0:
+        return aplGreater
+    elif len(args)==2: # Dyadic only
+        return np.greater(args[0],args[1])
+    else:
+        raise APLArgumentException
+
+#≠
+def aplNEq(*args):
+    """
+    (Dyadic only)
+    Dyadic:\tLess than or equal to
+    """
+    if len(args)==0:
+        return aplNEq
+    elif len(args)==2: # Dyadic only
+        return np.not_equal(args[0],args[1])
+    else:
+        raise APLArgumentException
+
+#⍴,⍪⌽⊖⍉↑↓⊂⊆∊⊃/⌿\\⍀∩∪⊣⊢⍳⍸⍒⍋⍷≡≢⍎⍕⊥⊤⌹⌷
