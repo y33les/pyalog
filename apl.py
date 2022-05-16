@@ -473,13 +473,14 @@ def aplRho(*args):
     if len(args)==0:
         return aplRho
     elif len(args)==1: # Monadic
-        return np.shape(args[0])
+        return np.array(np.shape(args[0]))
     elif len(args)==2: # Dyadic
         return np.reshape(args[1],args[0])
     else:
         raise APLArgumentException
 
 #,
+# FIXME: need to sort out axis requirement
 def aplComma(*args):
     """
     Monadic:\tRavel

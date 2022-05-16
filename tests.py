@@ -155,7 +155,13 @@ if __name__ == '__main__':
     print("OK")
 
     print("aplRho...",end=" ")
-    assert apl.aplRho(np.array([0,1,2,3,4,5])) == (6,)
-    assert apl.aplRho(np.array([[0,1,2],[3,4,5]])) == (2,3)
+    assert (apl.aplRho(np.array([0,1,2,3,4,5])) == np.array([6])).all()
+    assert (apl.aplRho(np.array([[0,1,2],[3,4,5]])) == np.array([2,3])).all()
     assert (apl.aplRho(np.array([2,3]),np.array([0,1,2,3,4,5])) == np.array([[0,1,2],[3,4,5]])).all()
+    print("OK")
+
+    # FIXME: need to sort out axis requirement
+    print("aplComma...",end=" ")
+    assert (apl.aplComma(np.array([[0,1,2],[3,4,5]])) == np.array([0,1,2,3,4,5])).all()
+    assert (apl.aplComma(np.array([0,1,2]),np.array([3,4,5])) == np.array([0,1,2,3,4,5])).all()
     print("OK")
