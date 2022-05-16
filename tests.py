@@ -1,5 +1,6 @@
 import apl
 import math
+import numpy as np
 from functools import reduce
 from operator import and_
 
@@ -153,3 +154,8 @@ if __name__ == '__main__':
     assert apl.aplNEq(2,2) == 0
     print("OK")
 
+    print("aplRho...",end=" ")
+    assert apl.aplRho(np.array([0,1,2,3,4,5])) == (6,)
+    assert apl.aplRho(np.array([[0,1,2],[3,4,5]])) == (2,3)
+    assert (apl.aplRho(np.array([2,3]),np.array([0,1,2,3,4,5])) == np.array([[0,1,2],[3,4,5]])).all()
+    print("OK")

@@ -42,8 +42,10 @@ lookup = {
     '=': 'aplEquals',
     '≥': 'aplGEq',
     '>': 'aplGreater',
-    '≠': 'aplNEq'
-    #⍴,⍪⌽⊖⍉↑↓⊂⊆∊⊃/⌿\\⍀∩∪⊣⊢⍳⍸⍒⍋⍷≡≢⍎⍕⊥⊤⌹⌷
+    '≠': 'aplNEq',
+    '⍴': 'aplRho',
+    ',': 'aplComma'
+    #⍪⌽⊖⍉↑↓⊂⊆∊⊃/⌿\\⍀∩∪⊣⊢⍳⍸⍒⍋⍷≡≢⍎⍕⊥⊤⌹⌷
 }
 
 # TODO: Do nilads exist in Dyalog?  Or should it just return the function itself?
@@ -414,7 +416,7 @@ def aplLEq(*args):
 def aplEquals(*args):
     """
     (Dyadic only)
-    Dyadic:\tLess than or equal to
+    Dyadic:\tEquals
     """
     if len(args)==0:
         return aplEquals
@@ -427,7 +429,7 @@ def aplEquals(*args):
 def aplGEq(*args):
     """
     (Dyadic only)
-    Dyadic:\tLess than or equal to
+    Dyadic:\tGreater than or equal to
     """
     if len(args)==0:
         return aplGEq
@@ -440,7 +442,7 @@ def aplGEq(*args):
 def aplGreater(*args):
     """
     (Dyadic only)
-    Dyadic:\tLess than or equal to
+    Dyadic:\tGreater than
     """
     if len(args)==0:
         return aplGreater
@@ -453,7 +455,7 @@ def aplGreater(*args):
 def aplNEq(*args):
     """
     (Dyadic only)
-    Dyadic:\tLess than or equal to
+    Dyadic:\tNot equal to
     """
     if len(args)==0:
         return aplNEq
@@ -462,4 +464,34 @@ def aplNEq(*args):
     else:
         raise APLArgumentException
 
-#⍴,⍪⌽⊖⍉↑↓⊂⊆∊⊃/⌿\\⍀∩∪⊣⊢⍳⍸⍒⍋⍷≡≢⍎⍕⊥⊤⌹⌷
+#⍴
+def aplRho(*args):
+    """
+    Monadic:\tShape
+    Dyadic:\tReshape
+    """
+    if len(args)==0:
+        return aplRho
+    elif len(args)==1: # Monadic
+        return np.shape(args[0])
+    elif len(args)==2: # Dyadic
+        return np.reshape(args[1],args[0])
+    else:
+        raise APLArgumentException
+
+#,
+def aplComma(*args):
+    """
+    Monadic:\tRavel
+    Dyadic:\tTODO
+    """
+    if len(args)==0:
+        return aplRavel
+    elif len(args)==1: # Monadic
+        return np.ravel(args[0])
+    elif len(args)==2: # Dyadic
+        return np.concatenate(args[0],args[1])
+    else:
+        raise APLArgumentException
+
+#⍪⌽⊖⍉↑↓⊂⊆∊⊃/⌿\\⍀∩∪⊣⊢⍳⍸⍒⍋⍷≡≢⍎⍕⊥⊤⌹⌷
