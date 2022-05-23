@@ -7,6 +7,7 @@ from operator import and_
 if __name__ == '__main__':
     # apl.py functions
     # TODO: tests on arrays
+    # TODO: tests on 2D, 3D arrays
 
     print("aplPlus...",end=" ")
     assert apl.aplPlus(complex(2,3)) == complex(2,-3)
@@ -160,8 +161,18 @@ if __name__ == '__main__':
     assert (apl.aplRho(np.array([2,3]),np.array([0,1,2,3,4,5])) == np.array([[0,1,2],[3,4,5]])).all()
     print("OK")
 
-    # FIXME: need to sort out axis requirement
     print("aplComma...",end=" ")
     assert (apl.aplComma(np.array([[0,1,2],[3,4,5]])) == np.array([0,1,2,3,4,5])).all()
     assert (apl.aplComma(np.array([0,1,2]),np.array([3,4,5])) == np.array([0,1,2,3,4,5])).all()
     print("OK")
+
+    # TODO: Write test when ⍪ is actually implemented
+    print("aplTable...",end=" ")
+    assert 1==1
+    print("OK")
+
+    print("aplRotate...",end=" ")
+    assert (apl.aplRotate(np.array([1,2,3,4,5])) == np.array([5,4,3,2,1])).all()
+    assert (apl.aplRotate(2,np.array([1,2,3,4,5])) == np.array([3,4,5,1,2])).all()
+    print("OK")
+

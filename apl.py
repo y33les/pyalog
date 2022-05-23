@@ -44,8 +44,11 @@ lookup = {
     '>': 'aplGreater',
     '≠': 'aplNEq',
     '⍴': 'aplRho',
-    ',': 'aplComma'
-    #⍪⌽⊖⍉↑↓⊂⊆∊⊃/⌿\\⍀∩∪⊣⊢⍳⍸⍒⍋⍷≡≢⍎⍕⊥⊤⌹⌷
+    ',': 'aplComma',
+    '⍪': 'aplTable',
+    '⌽': 'aplRotate',
+    '⊖': 'aplRotate1'
+    #⍉↑↓⊂⊆∊⊃/⌿\\⍀∩∪⊣⊢⍳⍸⍒⍋⍷≡≢⍎⍕⊥⊤⌹⌷
 }
 
 # TODO: Do nilads exist in Dyalog?  Or should it just return the function itself?
@@ -480,19 +483,63 @@ def aplRho(*args):
         raise APLArgumentException
 
 #,
-# FIXME: need to sort out axis requirement
 def aplComma(*args):
     """
     Monadic:\tRavel
-    Dyadic:\tTODO
+    Dyadic:\tCatenate
     """
     if len(args)==0:
         return aplRavel
     elif len(args)==1: # Monadic
         return np.ravel(args[0])
     elif len(args)==2: # Dyadic
-        return np.concatenate(args[0],args[1])
+        return np.concatenate((args[0],args[1]))
     else:
         raise APLArgumentException
 
-#⍪⌽⊖⍉↑↓⊂⊆∊⊃/⌿\\⍀∩∪⊣⊢⍳⍸⍒⍋⍷≡≢⍎⍕⊥⊤⌹⌷
+#⍪
+def aplTable(*args): # TODO: Need to actually grok what ⍪ does before I can implement it!
+    """
+    Monadic:\tTable
+    Dyadic:\tCatenate first
+    """
+    if len(args)==0:
+        return aplTable
+    elif len(args)==1: # Monadic
+        raise NYI
+    elif len(args)==2: # Dyadic
+        raise NYI
+    else:
+        raise APLArgumentException
+
+#⌽
+def aplRotate(*args):
+    """
+    Monadic:\tReverse
+    Dyadic:\tRotate
+    """
+    if len(args)==0:
+        return aplRotate
+    elif len(args)==1: # Monadic
+        return np.fliplr(args[0])
+    elif len(args)==2: # Dyadic
+        return np.roll(args[1],len(args[1])-args[0],axis=len(np.shape(args[1]))-1)
+    else:
+        raise APLArgumentException
+
+#⊖
+def aplRotate1(*args):
+    """
+    Monadic:\tReverse first
+    Dyadic:\tRotate first
+    """
+    if len(args)==0:
+        return aplRotate1
+    elif len(args)==1: # Monadic
+        return np.flipud(args[0])
+    elif len(args)==2: # Dyadic
+        return np.roll(args[1],len(args[1])-args[0],axis=0)
+    else:
+        raise APLArgumentException
+
+#⍉↑↓⊂⊆∊⊃/⌿\\⍀∩∪⊣⊢⍳⍸⍒⍋⍷≡≢⍎⍕⊥⊤⌹⌷
