@@ -37,9 +37,13 @@ class APLParse(Parser):
     def root(self,p):
         return ast.fix_missing_locations(exprWrap(p.expr)) # The lineno fix should be in the root node only, and this should also be the only ast.Expression (the lineno fix fails for nested ast.Expressions)
 
-    @_('LPAREN expr RPAREN')
+    @_('bexpr')
     def expr(self,p):
-        return callWrap('encapsulate',[p.expr])
+        return callWrap('toAPLArray',[callWrap('toAPLArray',[p.bexpr])]) # FIXME
+
+    @_('LPAREN expr RPAREN')
+    def bexpr(self,p):
+        return callWrap('encapsulate',[p.expr]) # TODO: Is encapsulate necessary anymore, now that we have bexprs?
 
     @_('const')
     def expr(self,p):
@@ -51,7 +55,7 @@ class APLParse(Parser):
     @_('PFUNC') # Nilad
     def expr(self, p):
         print(p.PFUNC)
-        return callPFunc(lookup.get(p.PFUNC))
+        return ast.Name(id=lookup.get(p.PFUNC),ctx=ast.Load())
 
     @_('PFUNC expr') # Monad
     def expr(self, p):
@@ -66,10 +70,6 @@ class APLParse(Parser):
     @_('expr SPACE expr')
     def expr(self,p):
         return callWrap('appendAPLArray',[p.expr0,p.expr1])
-
-    @_('const SPACE const')
-    def expr(self, p):
-        return callWrap('appendAPLArray',[p.const0,p.const1])
 
     @_('NUMBER')
     def const(self, p):
