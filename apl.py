@@ -47,8 +47,10 @@ lookup = {
     ',': 'aplComma',
     '⍪': 'aplTable',
     '⌽': 'aplRotate',
-    '⊖': 'aplRotate1'
-    #⍉↑↓⊂⊆∊⊃/⌿\\⍀∩∪⊣⊢⍳⍸⍒⍋⍷≡≢⍎⍕⊥⊤⌹⌷
+    '⊖': 'aplRotate1',
+    '⍉': 'aplTranspose',
+    '↑': 'aplMix'
+    #↓⊂⊆∊⊃/⌿\\⍀∩∪⊣⊢⍳⍸⍒⍋⍷≡≢⍎⍕⊥⊤⌹⌷
 }
 
 # TODO: Do nilads exist in Dyalog?  Or should it just return the function itself?
@@ -60,6 +62,8 @@ lookup = {
 ######################################################################
 
 # TODO: Note that outer product is already implemented by numpy (numpy.ufunc.outer)
+
+# TODO: probably need to add a third arg to each function to specify axis so that the rank operator will work
 
 # +
 def aplPlus(*args):
@@ -521,7 +525,7 @@ def aplRotate(*args):
     if len(args)==0:
         return aplRotate
     elif len(args)==1: # Monadic
-        return np.fliplr(args[0])
+        return np.flip(args[0],axis=len(np.shape(args[0]))-1)
     elif len(args)==2: # Dyadic
         return np.roll(args[1],len(args[1])-args[0],axis=len(np.shape(args[1]))-1)
     else:
@@ -536,10 +540,44 @@ def aplRotate1(*args):
     if len(args)==0:
         return aplRotate1
     elif len(args)==1: # Monadic
-        return np.flipud(args[0])
+        return np.flip(args[0],axis=0)
     elif len(args)==2: # Dyadic
         return np.roll(args[1],len(args[1])-args[0],axis=0)
     else:
         raise APLArgumentException
 
-#⍉↑↓⊂⊆∊⊃/⌿\\⍀∩∪⊣⊢⍳⍸⍒⍋⍷≡≢⍎⍕⊥⊤⌹⌷
+#⍉
+def aplTranspose(*args):
+    """
+    Monadic:\tTranspose
+    Dyadic:\tTranspose
+    """
+    if len(args)==0:
+        return aplTranspose
+    elif len(args)==1: # Monadic
+        return np.transpose(args[0])
+    elif len(args)==2: # Dyadic
+        return np.moveaxis(args[1],np.array(range(0,len(args[0]))),args[0])
+    else:
+        raise APLArgumentException
+
+#↑
+def aplMix(*args):
+    """
+    Monadic:\tMix
+    Dyadic:\tTake
+    """
+    if len(args)==0:
+        return aplMix
+    elif len(args)==1: # Monadic
+        x=args[0]
+        d=np.max(np.array([len(x) for i in x]))
+        x=np.array(np.array([np.append(i,0*np.array(range(0,d-len(i)))) for i in x])) # FIXME: Weirdly converts ints to floats at this step for some reason
+        return np.reshape(x,(len(x[0]),len(x)))
+        # FIXME: Dyalog pads with 0s if numeric only, doesn't pad and does ragged if any chars present - fix for arrays with chars present
+    elif len(args)==2: # Dyadic
+        raise NYI # TODO: need to spend some time grokking how this works with padding, negative indices, array takes
+    else:
+        raise APLArgumentException
+
+#↓⊂⊆∊⊃/⌿\\⍀∩∪⊣⊢⍳⍸⍒⍋⍷≡≢⍎⍕⊥⊤⌹⌷
